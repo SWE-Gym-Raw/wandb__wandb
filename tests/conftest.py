@@ -95,8 +95,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
             values = [True]
             ids = ["no_wandb_core"]
         else:
-            values = [True, False]
-            ids = ["no_wandb_core", "wandb_core"]
+            values = [False]
+            ids = ["wandb_core"]
 
         metafunc.parametrize(
             toggle_legacy_service.__name__,

@@ -170,6 +170,7 @@ def unit_tests(session: nox.Session) -> None:
 
     install_timed(
         session,
+        "-vv",
         "-r",
         "requirements_dev.txt",
         # For test_reports:
@@ -190,6 +191,7 @@ def system_tests(session: nox.Session) -> None:
     install_wandb(session)
     install_timed(
         session,
+        "-vv",
         "-r",
         "requirements_dev.txt",
         "annotated-types",  # for test_reports
@@ -217,6 +219,7 @@ def notebook_tests(session: nox.Session) -> None:
     install_wandb(session)
     install_timed(
         session,
+        "-vv",
         "-r",
         "requirements_dev.txt",
         "nbclient",
@@ -252,6 +255,7 @@ def functional_tests(session: nox.Session):
     install_wandb(session)
     install_timed(
         session,
+        "-vv",
         "-r",
         "requirements_dev.txt",
     )
@@ -273,6 +277,7 @@ def experimental_tests(session: nox.Session):
     install_wandb(session)
     install_timed(
         session,
+        "-vv",
         "-r",
         "requirements_dev.txt",
     )
