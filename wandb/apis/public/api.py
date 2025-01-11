@@ -40,9 +40,11 @@ from wandb.sdk.automations import Automation, NewAutomation, PreparedAutomation
 from wandb.sdk.automations._generated import (
     CREATE_FILTER_TRIGGER_GQL,
     DELETE_TRIGGER_GQL,
+    UPDATE_FILTER_TRIGGER_GQL,
     CreateFilterTrigger,
     DeleteTrigger,
     DeleteTriggerResult,
+    UpdateFilterTrigger,
 )
 from wandb.sdk.automations._utils import prepare_create_trigger_input
 from wandb.sdk.internal.internal_api import Api as InternalApi
@@ -1611,6 +1613,32 @@ class Api:
         except ValidationError as e:
             # Omit the response data, it's likely to add unhelpful noise
             msg = f"Unexpected response while creating automation {name!r}"
+            raise ValueError(msg) from e
+
+    def update_automation(self, obj: Automation) -> Automation:
+        """Update an existing automation to the state of the given automation.
+
+        Args:
+            obj: The automation to update.  Must be an existing automation.
+        """
+        # keep the name on hand, if needed later to report on errors
+        name = obj.name
+
+        mutation = gql(UPDATE_FILTER_TRIGGER_GQL)
+        variables = {"params": obj.model_dump()}
+        data = self.client.execute(mutation, variable_values=variables)
+        try:
+            result = UpdateFilterTrigger.model_validate(data).update_filter_trigger
+            return Automation.model_validate(result.trigger)
+        except AttributeError as e:
+            # This should not happen on a 200 response, but if it does, it means
+            # one of the top-level fields was None.  Showing the response data in
+            # full is unlikely to add much noise, so we may as well.
+            msg = f"Unexpected response while updating automation {name!r}: {data!r}"
+            raise ValueError(msg) from e
+        except ValidationError as e:
+            # Omit the response data, it's likely to add unhelpful noise
+            msg = f"Unexpected response while updating automation {name!r}"
             raise ValueError(msg) from e
 
     def delete_automation(self, obj: Union[str, Automation]) -> DeleteTriggerResult:
